@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>Interactive Code Playground</title>
+    <title>Interactive Code Portfolio</title>
 </head>
 <body>
+    <div class="app">
     <div class="header">
-        <div class="logo">Interactive Code Portfolio</div>
+        <div class="logo">
+            <img src="logo.png" alt="Scriptly Logo" class="logo-img">
+            Interactive Code Portfolio
+        </div>
         <div class="toolbar">
             <button class="btn btn-dark" onclick="toggleDarkMode()">🌙</button>
             <button class="btn btn-purple" onclick="saveCode()">💾 Save</button>
@@ -125,6 +129,7 @@ console.log('Hello from the console!');</textarea>
             <div class="ready-indicator">READY</div>
         </div>
     </div>
+</div>
 
     <script src="js/app.js"></script>
 </body>

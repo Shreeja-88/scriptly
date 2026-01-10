@@ -3,13 +3,40 @@
     padding: 0;
     box-sizing: border-box;
 }
+body {
+    margin: 0;
+}
+
+.app {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    height: 50px;
+}
+
+.main-container {
+    flex: 1; /* auto-adjusts */
+    display: flex;
+}
+
+.console {
+    height: 150px;
+}
+
+.status-bar {
+    height: 35px;
+}
+
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
     color: #e0e8f0;
     height: 100vh;
-    overflow: hidden;
+    overflow: auto;
     transition: all 0.3s ease;
 }
 
@@ -179,10 +206,14 @@ body.light-mode .empty-state p {
     transition: all 0.3s ease;
 }
 
-.logo::before {
-    content: "⚡";
-    font-size: 24px;
+.logo-img {
+    width: 40px;
+    height: 40px;
     animation: pulse 2s ease-in-out infinite;
+}
+
+.logo::before {
+    display: none; /* Hide the emoji when using image */
 }
 
 @keyframes pulse {
