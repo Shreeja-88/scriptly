@@ -1,12 +1,11 @@
-// ==================== Global Variables ====================
+/* ==================== Global Variables ==================== */
 let htmlEditor, cssEditor, jsEditor;
 let currentTab = 'html';
 let autoSaveTimeout;
-let consoleMessages = [];
+let errorMarker = null;
 
-// ==================== CodeMirror Initialization ====================
+/* ==================== Initialize Editors ==================== */
 function initializeEditors() {
-    // HTML Editor
     htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-editor'), {
         mode: 'htmlmixed',
         theme: 'monokai',
@@ -14,46 +13,35 @@ function initializeEditors() {
         autoCloseTags: true,
         autoCloseBrackets: true,
         matchBrackets: true,
-        indentUnit: 2,
-        tabSize: 2,
         lineWrapping: true
     });
 
-    // CSS Editor
     cssEditor = CodeMirror.fromTextArea(document.getElementById('css-editor'), {
         mode: 'css',
         theme: 'monokai',
         lineNumbers: true,
         autoCloseBrackets: true,
-        matchBrackets: true,
-        indentUnit: 2,
-        tabSize: 2,
         lineWrapping: true
     });
 
-    // JavaScript Editor
     jsEditor = CodeMirror.fromTextArea(document.getElementById('js-editor'), {
         mode: 'javascript',
         theme: 'monokai',
         lineNumbers: true,
         autoCloseBrackets: true,
         matchBrackets: true,
-        indentUnit: 2,
-        tabSize: 2,
         lineWrapping: true
     });
 
-    // Hide all editors initially except HTML
     cssEditor.getWrapperElement().style.display = 'none';
     jsEditor.getWrapperElement().style.display = 'none';
 
-    // Add change listeners
     htmlEditor.on('change', handleEditorChange);
     cssEditor.on('change', handleEditorChange);
     jsEditor.on('change', handleEditorChange);
 }
 
-// ==================== Editor Change Handler ====================
+/* ==================== Editor Change ==================== */
 function handleEditorChange() {
     clearTimeout(autoSaveTimeout);
     autoSaveTimeout = setTimeout(() => {
@@ -63,178 +51,292 @@ function handleEditorChange() {
     }, 1000);
 }
 
-// ==================== Tab Switching ====================
-function switchTab(tabName) {
-    currentTab = tabName;
+/* ==================== Tabs ==================== */
+function switchTab(tab) {
+    currentTab = tab;
 
-    // Update tab styling
-    document.querySelectorAll('.tab').forEach(tab => {
-        tab.classList.remove('active');
-    });
-    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
 
-    // Show/hide editors
-    htmlEditor.getWrapperElement().style.display = tabName === 'html' ? 'block' : 'none';
-    cssEditor.getWrapperElement().style.display = tabName === 'css' ? 'block' : 'none';
-    jsEditor.getWrapperElement().style.display = tabName === 'js' ? 'block' : 'none';
+    htmlEditor.getWrapperElement().style.display = tab === 'html' ? 'block' : 'none';
+    cssEditor.getWrapperElement().style.display = tab === 'css' ? 'block' : 'none';
+    jsEditor.getWrapperElement().style.display = tab === 'js' ? 'block' : 'none';
 
-    // Refresh the visible editor
-    if (tabName === 'html') htmlEditor.refresh();
-    if (tabName === 'css') cssEditor.refresh();
-    if (tabName === 'js') jsEditor.refresh();
+    htmlEditor.refresh();
+    cssEditor.refresh();
+    jsEditor.refresh();
 }
 
-// ==================== Run Code ====================
+/* ==================== Console ==================== */
+function addConsoleMessage(type, args) {
+    const output = document.getElementById('consoleOutput');
+    const msg = document.createElement('div');
+
+    msg.className = `console-message ${type}`;
+    msg.textContent =
+        '> ' +
+        args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
+
+    output.appendChild(msg);
+    output.scrollTop = output.scrollHeight;
+}
+
+function clearConsole() {
+    document.getElementById('consoleOutput').innerHTML = '';
+}
+
+/* ==================== Run Code ==================== */
 function runCode() {
-    const html = htmlEditor.getValue();
-    const css = cssEditor.getValue();
-    const js = jsEditor.getValue();
-
     const preview = document.getElementById('preview');
-    
-    // Clear console
-    consoleMessages = [];
-    
+    clearConsole();
+
+    if (errorMarker) {
+        errorMarker.clear();
+        errorMarker = null;
+    }
+
     const content = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>${css}</style>
-        </head>
-        <body>
-            ${html}
-            <script>
-                // Override console methods to capture output
-                (function() {
-                    const originalLog = console.log;
-                    const originalError = console.error;
-                    const originalWarn = console.warn;
+<!DOCTYPE html>
+<html>
+<head>
+<style>${cssEditor.getValue()}</style>
+</head>
+<body>
+${htmlEditor.getValue()}
 
-                    console.log = function(...args) {
-                        window.parent.postMessage({
-                            type: 'console',
-                            method: 'log',
-                            data: args
-                        }, '*');
-                        originalLog.apply(console, args);
-                    };
+<script>
+(function(){
+    function send(type, args){
+        parent.postMessage({ type, args }, '*');
+    }
 
-                    console.error = function(...args) {
-                        window.parent.postMessage({
-                            type: 'console',
-                            method: 'error',
-                            data: args
-                        }, '*');
-                        originalError.apply(console, args);
-                    };
+    console.log = (...args) => send('log', args);
+    console.warn = (...args) => send('warn', args);
+    console.error = (...args) => send('error', args);
 
-                    console.warn = function(...args) {
-                        window.parent.postMessage({
-                            type: 'console',
-                            method: 'warn',
-                            data: args
-                        }, '*');
-                        originalWarn.apply(console, args);
-                    };
-
-                    try {
-                        ${js}
-                    } catch(e) {
-                        console.error('Error: ' + e.message);
-                        document.body.innerHTML += '<div style="background:#fee;color:#c33;padding:20px;margin:10px;border-left:4px solid #c33;border-radius:4px;font-family:monospace;"><strong>⚠️ JavaScript Error:</strong><br>' + e.message + '</div>';
-                    }
-                })();
-            <\/script>
-        </body>
-        </html>
-    `;
+    try {
+${jsEditor.getValue()}
+    } catch (e) {
+        send('error', [e.message, e.stack]);
+        throw e;
+    }
+})();
+<\/script>
+</body>
+</html>
+`;
 
     preview.srcdoc = content;
     updateStatus('Running...', false);
 
-    setTimeout(() => {
-        updateStatus('Ready', false);
-    }, 500);
+    setTimeout(() => updateStatus('Ready', false), 400);
 }
 
-// ==================== Console Message Handler ====================
-window.addEventListener('message', (event) => {
-    if (event.data.type === 'console') {
-        addConsoleMessage(event.data.method, event.data.data);
+/* ==================== Console Listener ==================== */
+window.addEventListener('message', e => {
+    if (!e.data || !e.data.type) return;
+
+    addConsoleMessage(e.data.type, e.data.args);
+
+    if (e.data.type === 'error' && e.data.args[1]) {
+        highlightJsError(e.data.args[1]);
+        updateStatus('Error', true);
     }
 });
 
-function addConsoleMessage(method, data) {
-    const consoleOutput = document.getElementById('consoleOutput');
-    const message = document.createElement('div');
-    message.className = `console-message ${method}`;
-    
-    const formattedData = data.map(item => {
-        if (typeof item === 'object') {
-            return JSON.stringify(item, null, 2);
-        }
-        return String(item);
-    }).join(' ');
-    
-    message.textContent = `> ${formattedData}`;
-    consoleOutput.appendChild(message);
-    consoleOutput.scrollTop = consoleOutput.scrollHeight;
+/* ==================== Error Highlight ==================== */
+function highlightJsError(stack) {
+    const match = stack.match(/<anonymous>:(\d+):(\d+)/);
+    if (!match) return;
+
+    const line = parseInt(match[1], 10) - 1;
+
+    if (errorMarker) errorMarker.clear();
+
+    errorMarker = jsEditor.markText(
+        { line, ch: 0 },
+        { line, ch: 100 },
+        { className: 'cm-error-line' }
+    );
+
+    jsEditor.focus();
+    jsEditor.setCursor({ line, ch: 0 });
 }
 
-// ==================== Storage Functions ====================
-function saveCode() {
-    const data = {
-        html: htmlEditor.getValue(),
-        css: cssEditor.getValue(),
-        js: jsEditor.getValue(),
-        timestamp: new Date().toISOString()
-    };
-
-    localStorage.setItem('codePortfolio', JSON.stringify(data));
-    updateStatus('Saved!', false);
-    updateTimestamp();
-
-    setTimeout(() => {
-        updateStatus('Ready', false);
-    }, 2000);
-}
-
+/* ==================== Storage ==================== */
 function autoSave() {
-    const data = {
+    localStorage.setItem('codePortfolio', JSON.stringify({
         html: htmlEditor.getValue(),
         css: cssEditor.getValue(),
         js: jsEditor.getValue(),
         timestamp: new Date().toISOString()
-    };
-
-    localStorage.setItem('codePortfolio', JSON.stringify(data));
+    }));
     updateTimestamp();
+}
+
+function saveCode() {
+    autoSave();
+    updateStatus('Saved!', false);
 }
 
 function loadCode() {
     const saved = localStorage.getItem('codePortfolio');
-    if (saved) {
-        const data = JSON.parse(saved);
+    if (!saved) return;
+
+    const data = JSON.parse(saved);
+    htmlEditor.setValue(data.html || '');
+    cssEditor.setValue(data.css || '');
+    jsEditor.setValue(data.js || '');
+    runCode();
+}
+
+/* ==================== Export ==================== */
+function exportCode() {
+    const blob = new Blob([`
+<!DOCTYPE html>
+<html>
+<head><style>${cssEditor.getValue()}</style></head>
+<body>
+${htmlEditor.getValue()}
+<script>${jsEditor.getValue()}<\/script>
+</body>
+</html>`], { type: 'text/html' });
+
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'project.html';
+    a.click();
+}
+
+/* ==================== Share ==================== */
+function shareCode() {
+    const data = {
+        html: htmlEditor.getValue(),
+        css: cssEditor.getValue(),
+        js: jsEditor.getValue()
+    };
+
+    const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
+    const url = `${location.origin}${location.pathname}?code=${encoded}`;
+
+    navigator.clipboard.writeText(url);
+    updateStatus('Link Copied!', false);
+}
+
+/* ==================== Load Shared ==================== */
+function loadSharedCode() {
+    const params = new URLSearchParams(location.search);
+    if (!params.has('code')) return;
+
+    try {
+        const data = JSON.parse(decodeURIComponent(atob(params.get('code'))));
         htmlEditor.setValue(data.html || '');
         cssEditor.setValue(data.css || '');
         jsEditor.setValue(data.js || '');
         runCode();
-        updateStatus('Loaded!', false);
-        updateTimestamp();
-
-        setTimeout(() => {
-            updateStatus('Ready', false);
-        }, 2000);
-    } else {
-        updateStatus('No saved code', true);
-        setTimeout(() => {
-            updateStatus('Ready', false);
-        }, 2000);
-    }
+    } catch {}
 }
 
-function clearAll() {
-    if (confirm('Are you sure you want to clear all code? This cannot be undone.')) {
+/* ==================== Theme ==================== */
+function toggleTheme() {
+    document.body.classList.toggle('light-theme');
+    const light = document.body.classList.contains('light-theme');
+    const theme = light ? 'eclipse' : 'monokai';
+
+    htmlEditor.setOption('theme', theme);
+    cssEditor.setOption('theme', theme);
+    jsEditor.setOption('theme', theme);
+
+    document.getElementById('themeIcon').textContent = light ? '☀️' : '🌙';
+}
+
+/* ==================== Stats ==================== */
+function updateStats() {
+    const html = htmlEditor.getValue();
+    const css = cssEditor.getValue();
+    const js = jsEditor.getValue();
+
+    document.getElementById('charCount').textContent =
+        (html.length + css.length + js.length).toLocaleString();
+
+    document.getElementById('lineCount').textContent =
+        (html.split('\n').length + css.split('\n').length + js.split('\n').length).toLocaleString();
+}
+
+function updateTimestamp() {
+    const saved = localStorage.getItem('codePortfolio');
+    if (!saved) return;
+
+    const t = new Date(JSON.parse(saved).timestamp);
+    document.getElementById('timestamp').textContent = t.toLocaleTimeString();
+}
+
+function updateStatus(msg, err) {
+    const s = document.getElementById('status');
+    s.textContent = msg;
+    s.className = 'status' + (err ? ' error' : '');
+}
+
+/* ==================== Templates ==================== */
+const templates = {
+    blank: { html: '', css: '', js: '' }
+};
+
+function loadTemplate(name) {
+    const t = templates[name];
+    if (!t) return;
+
+    htmlEditor.setValue(t.html);
+    cssEditor.setValue(t.css);
+    jsEditor.setValue(t.js);
+    runCode();
+    closeModal('templateModal');
+}
+
+/* ==================== Modals ==================== */
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+/* ==================== Init ==================== */
+document.addEventListener('DOMContentLoaded', () => {
+    initializeEditors();
+
+    loadSharedCode();
+    loadCode();
+    updateStats();
+
+    document.querySelectorAll('.tab').forEach(tab =>
+        tab.onclick = () => switchTab(tab.dataset.tab)
+    );
+
+    document.getElementById('runBtn').onclick = runCode;
+    document.getElementById('saveBtn').onclick = saveCode;
+    document.getElementById('loadBtn').onclick = loadCode;
+    document.getElementById('exportBtn').onclick = exportCode;
+    document.getElementById('shareBtn').onclick = shareCode;
+    document.getElementById('clearBtn').onclick = () => {
         htmlEditor.setValue('');
+        cssEditor.setValue('');
+        jsEditor.setValue('');
+        runCode();
+    };
+
+    document.getElementById('themeToggle').onclick = toggleTheme;
+    document.getElementById('templateBtn').onclick = () => openModal('templateModal');
+    document.getElementById('clearConsole').onclick = clearConsole;
+
+    document.querySelectorAll('.close').forEach(c =>
+        c.onclick = () => closeModal(c.closest('.modal').id)
+    );
+
+    document.querySelectorAll('.template-card').forEach(card =>
+        card.onclick = () => loadTemplate(card.dataset.template)
+    );
+
+    setInterval(autoSave, 30000);
+});

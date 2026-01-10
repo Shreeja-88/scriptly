@@ -1,3 +1,127 @@
+/* ==================== PREMIUM ACCENTS ==================== */
+:root {
+    --gradient-accent: linear-gradient(135deg, #4f46e5, #06b6d4);
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glow: 0 0 0 rgba(79, 70, 229, 0.4);
+}
+.header {
+    backdrop-filter: blur(14px);
+    background: linear-gradient(
+        180deg,
+        rgba(30,30,30,0.85),
+        rgba(30,30,30,0.65)
+    );
+    border-bottom: 1px solid var(--glass-border);
+}
+.btn {
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gradient-accent);
+    opacity: 0;
+    transition: opacity 0.25s;
+    z-index: -1;
+}
+
+.btn:hover::after {
+    opacity: 1;
+}
+
+.btn-primary {
+    background: var(--gradient-accent);
+    box-shadow: 0 10px 30px rgba(79,70,229,0.3);
+}
+.tabs {
+    backdrop-filter: blur(8px);
+}
+
+.tab {
+    position: relative;
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    left: 10%;
+    bottom: 0;
+    width: 80%;
+    height: 3px;
+    background: var(--gradient-accent);
+    border-radius: 4px;
+}
+.CodeMirror {
+    background: transparent !important;
+}
+
+.editor-section {
+    background: linear-gradient(
+        160deg,
+        #1e1e1e,
+        #111827
+    );
+}
+.preview-section {
+    background: linear-gradient(180deg, #ffffff, #f8fafc);
+}
+
+.preview-header {
+    backdrop-filter: blur(6px);
+}
+
+#preview {
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+    margin: 12px;
+}
+.console-panel {
+    background: linear-gradient(
+        180deg,
+        #020617,
+        #020617ee
+    );
+}
+
+.console-message {
+    animation: consoleFade 0.25s ease;
+}
+
+@keyframes consoleFade {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.cm-error-line {
+    background: linear-gradient(
+        90deg,
+        rgba(239,68,68,0.4),
+        rgba(239,68,68,0.1)
+    );
+    border-left: 4px solid #ef4444;
+}
+.modal-content {
+    backdrop-filter: blur(16px);
+    background: linear-gradient(
+        180deg,
+        rgba(30,30,30,0.9),
+        rgba(17,24,39,0.9)
+    );
+}
+.btn:active {
+    transform: scale(0.96);
+}
+
+
 /* ==================== CSS Variables ==================== */
 :root {
     --bg-primary: #1e1e1e;
@@ -290,6 +414,10 @@ body {
 .console-message.warn {
     color: var(--warning);
 }
+.cm-error-line {
+    background: rgba(239, 68, 68, 0.25);
+}
+
 
 /* ==================== Footer ==================== */
 .footer {
