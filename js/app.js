@@ -8,6 +8,148 @@ document.addEventListener('DOMContentLoaded', function() {
     const tabs = document.querySelectorAll('.tab');
     const editors = [htmlEditor, cssEditor, jsEditor];
     let currentEditor = htmlEditor;
+    let autoRunEnabled = true;
+
+    // Track cursor position
+    function updateCursorPosition() {
+        const editor = currentEditor;
+        const pos = editor.selectionStart;
+        const text = editor.value.substring(0, pos);
+        const lines = text.split('\n');
+        const lineNum = lines.length;
+        const colNum = lines[lines.length - 1].length + 1;
+        
+        document.getElementById('lineNum').textContent = lineNum;
+        document.getElementById('colNum').textContent = colNum;
+    }
+
+    // Update language display
+    function updateLanguage(lang) {
+        const langMap = { html: 'HTML', css: 'CSS', js: 'JavaScript' };
+        document.getElementById('currentLang').textContent = langMap[lang] || 'HTML';
+    }
+
+    // Toggle auto-run
+    function toggleAutoRun() {
+        autoRunEnabled = !autoRunEnabled;
+        const toggleSwitch = document.getElementById('autoRunSwitch');
+        const label = document.getElementById('autoRunLabel');
+        
+        toggleSwitch.classList.toggle('active');
+        label.textContent = autoRunEnabled ? 'Auto Run' : 'Manual';
+        
+        if (autoRunEnabled) {
+            runCode();
+        }
+    }
+    window.toggleAutoRun = toggleAutoRun;
+
+    // Empty state visibility
+    function updateEmptyState() {
+        const isEmpty = currentEditor.value.trim() === '';
+        const emptyState = document.getElementById('emptyState');
+        
+        if (isEmpty) {
+            emptyState.classList.add('visible');
+        } else {
+            emptyState.classList.remove('visible');
+        }
+    }
+
+    // Resizer functionality
+    const resizer = document.getElementById('resizer');
+    const editorSection = document.querySelector('.editor-section');
+    const previewSection = document.querySelector('.preview-section');
+    let isResizing = false;
+
+    resizer.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        document.body.style.cursor = 'col-resize';
+        document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        
+        const containerWidth = document.querySelector('.main-container').offsetWidth;
+        const newEditorWidth = (e.clientX / containerWidth) * 100;
+        
+        if (newEditorWidth > 20 && newEditorWidth < 80) {
+            editorSection.style.flex = `0 0 ${newEditorWidth}%`;
+            previewSection.style.flex = `0 0 ${100 - newEditorWidth}%`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isResizing = false;
+        document.body.style.cursor = 'default';
+        document.body.style.userSelect = 'auto';
+    });
+
+    // Console resizer
+    const consoleResizer = document.getElementById('consoleResizer');
+    const consoleDiv = document.querySelector('.console');
+    let isResizingConsole = false;
+    let startY = 0;
+    let startHeight = 0;
+
+    consoleResizer.addEventListener('mousedown', (e) => {
+        isResizingConsole = true;
+        startY = e.clientY;
+        startHeight = consoleDiv.offsetHeight;
+        document.body.style.cursor = 'ns-resize';
+        document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizingConsole) return;
+        
+        const deltaY = startY - e.clientY;
+        const newHeight = startHeight + deltaY;
+        
+        if (newHeight > 100 && newHeight < 400) {
+            consoleDiv.style.height = `${newHeight}px`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isResizingConsole = false;
+        document.body.style.cursor = 'default';
+        document.body.style.userSelect = 'auto';
+    });
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        // Ctrl + Enter: Run code
+        if (e.ctrlKey && e.key === 'Enter') {
+            e.preventDefault();
+            runCode();
+        }
+        
+        // Ctrl + S: Save project
+        if (e.ctrlKey && e.key === 's') {
+            e.preventDefault();
+            saveCode();
+        }
+        
+        // Ctrl + O: Load project
+        if (e.ctrlKey && e.key === 'o') {
+            e.preventDefault();
+            loadCode();
+        }
+        
+        // Ctrl + L: Clear console
+        if (e.ctrlKey && e.key === 'l') {
+            e.preventDefault();
+            clearConsole();
+        }
+        
+        // Ctrl + /: Toggle shortcuts modal
+        if (e.ctrlKey && e.key === '/') {
+            e.preventDefault();
+            toggleShortcuts();
+        }
+    });
 
     // Tab switching functionality
     tabs.forEach(tab => {
@@ -28,6 +170,9 @@ document.addEventListener('DOMContentLoaded', function() {
             
             currentEditor.style.display = 'block';
             updateStats();
+            updateLanguage(lang);
+            updateCursorPosition();
+            updateEmptyState();
         });
     });
 
@@ -116,32 +261,64 @@ document.addEventListener('DOMContentLoaded', function() {
     // Make runCode available globally
     window.runCode = runCode;
 
-    // Save functionality
+    // Save functionality with project name
     function saveCode() {
+        const projectName = prompt('Enter project name:', 'My Project');
+        if (!projectName) return;
+        
         const code = {
+            name: projectName,
             html: htmlEditor.value,
             css: cssEditor.value,
             js: jsEditor.value,
             timestamp: new Date().toISOString()
         };
-        localStorage.setItem('savedCode', JSON.stringify(code));
-        alert('Code saved successfully!');
+        
+        // Get existing projects
+        let projects = JSON.parse(localStorage.getItem('codeProjects') || '[]');
+        
+        // Check if project exists and update it
+        const existingIndex = projects.findIndex(p => p.name === projectName);
+        if (existingIndex !== -1) {
+            projects[existingIndex] = code;
+        } else {
+            projects.push(code);
+        }
+        
+        localStorage.setItem('codeProjects', JSON.stringify(projects));
+        alert(`💾 Project "${projectName}" saved successfully!`);
     }
     window.saveCode = saveCode;
 
-    // Load functionality
+    // Load functionality with project selection
     function loadCode() {
-        const savedCode = localStorage.getItem('savedCode');
-        if (savedCode) {
-            const code = JSON.parse(savedCode);
+        const projects = JSON.parse(localStorage.getItem('codeProjects') || '[]');
+        
+        if (projects.length === 0) {
+            alert('❌ No saved projects found!');
+            return;
+        }
+        
+        // Create project list
+        let projectList = 'Select a project to load:\n\n';
+        projects.forEach((p, i) => {
+            const date = new Date(p.timestamp).toLocaleString();
+            projectList += `${i + 1}. ${p.name} (${date})\n`;
+        });
+        
+        const selection = prompt(projectList + '\nEnter project number:');
+        const index = parseInt(selection) - 1;
+        
+        if (index >= 0 && index < projects.length) {
+            const code = projects[index];
             htmlEditor.value = code.html;
             cssEditor.value = code.css;
             jsEditor.value = code.js;
             runCode();
             updateStats();
-            alert('Code loaded successfully!');
+            alert(`📁 Project "${code.name}" loaded successfully!`);
         } else {
-            alert('❌ No saved code found!');
+            alert('❌ Invalid selection!');
         }
     }
     window.loadCode = loadCode;
@@ -199,19 +376,60 @@ ${js}
     }
     window.shareCode = shareCode;
 
+    // Toggle shortcuts modal
+    function toggleShortcuts() {
+        const modal = document.getElementById('shortcutsModal');
+        modal.classList.toggle('active');
+    }
+    window.toggleShortcuts = toggleShortcuts;
+
+    // Close modal when clicking outside
+    document.getElementById('shortcutsModal').addEventListener('click', (e) => {
+        if (e.target.id === 'shortcutsModal') {
+            toggleShortcuts();
+        }
+    });
+
     // Clear functionality
     function clearCode() {
-        if (confirm('Are you sure you want to clear all code?')) {
+        if (confirm('⚠️ Are you sure you want to clear all code?')) {
             htmlEditor.value = '';
             cssEditor.value = '';
             jsEditor.value = '';
             runCode();
             updateStats();
             clearConsole();
-            alert('All code cleared!');
+            alert('🗑️ All code cleared!');
         }
     }
     window.clearCode = clearCode;
+
+    // Toggle dark mode
+    function toggleDarkMode() {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        
+        // Save preference
+        localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        
+        // Update button icon (optional)
+        const btn = event.target.closest('.btn');
+        if (btn) {
+            btn.textContent = isLight ? '☀️' : '🌙';
+        }
+    }
+    window.toggleDarkMode = toggleDarkMode;
+
+    // Load saved theme
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        // Update button if needed
+        const darkModeBtn = document.querySelector('.btn-dark');
+        if (darkModeBtn && darkModeBtn.textContent.includes('🌙')) {
+            darkModeBtn.textContent = '☀️';
+        }
+    }
 
     // Listen for console messages from iframe
     window.addEventListener('message', (event) => {
@@ -227,18 +445,35 @@ ${js}
         message.style.marginBottom = '8px';
         message.style.padding = '4px 0';
         
+        // Add timestamp
+        const timestamp = new Date().toLocaleTimeString('en-US', { 
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        
+        const timeSpan = document.createElement('span');
+        timeSpan.className = 'console-timestamp';
+        timeSpan.textContent = `[${timestamp}]`;
+        message.appendChild(timeSpan);
+        
+        // Add message content
+        const contentSpan = document.createElement('span');
+        
         // Style based on console method
         if (method === 'error') {
-            message.style.color = '#fda4af';
-            message.textContent = '❌ ' + args.join(' ');
+            contentSpan.className = 'console-error';
+            contentSpan.textContent = '❌ ' + args.join(' ');
         } else if (method === 'warn') {
-            message.style.color = '#fde68a';
-            message.textContent = '⚠️ ' + args.join(' ');
+            contentSpan.className = 'console-warn';
+            contentSpan.textContent = '⚠️ ' + args.join(' ');
         } else {
-            message.style.color = '#86efac';
-            message.textContent = '> ' + args.join(' ');
+            contentSpan.className = 'console-log';
+            contentSpan.textContent = '> ' + args.join(' ');
         }
         
+        message.appendChild(contentSpan);
         consoleOutput.appendChild(message);
         consoleOutput.scrollTop = consoleOutput.scrollHeight;
     }
@@ -277,13 +512,45 @@ ${js}
     editors.forEach(editor => {
         editor.addEventListener('input', () => {
             updateStats();
+            updateCursorPosition();
+            updateEmptyState();
+            
+            // Auto-run if enabled
+            if (autoRunEnabled) {
+                clearTimeout(window.autoRunTimeout);
+                window.autoRunTimeout = setTimeout(() => {
+                    runCode();
+                }, 500);
+            }
         });
+        
+        // Track cursor position on click and keyup
+        editor.addEventListener('click', updateCursorPosition);
+        editor.addEventListener('keyup', updateCursorPosition);
     });
 
     // Auto-save functionality (simulated)
     setInterval(() => {
-        updateLastSaved();
-    }, 1000);
+        // Auto-save to localStorage
+        const autoSave = {
+            html: htmlEditor.value,
+            css: cssEditor.value,
+            js: jsEditor.value,
+            timestamp: new Date().toISOString()
+        };
+        localStorage.setItem('autoSave', JSON.stringify(autoSave));
+    }, 5000);
+
+    // Load auto-save on start
+    const autoSave = localStorage.getItem('autoSave');
+    if (autoSave && htmlEditor.value.trim() === '<h1 id="hi">Hello world!</h1>') {
+        const saved = JSON.parse(autoSave);
+        if (confirm('🔄 Found auto-saved work. Would you like to restore it?')) {
+            htmlEditor.value = saved.html;
+            cssEditor.value = saved.css;
+            jsEditor.value = saved.js;
+        }
+    }
 
     // Check for shared code in URL
     const urlParams = new URLSearchParams(window.location.search);
@@ -294,13 +561,14 @@ ${js}
             htmlEditor.value = code.html;
             cssEditor.value = code.css;
             jsEditor.value = code.js;
-            alert('Shared code loaded successfully!');
         } catch (e) {
             console.error('Failed to load shared code');
         }
     }
 
-    // Initial run
-    runCode();
+    // Initial setup - IMPORTANT: Must run code to populate preview
     updateStats();
+    updateCursorPosition();
+    updateEmptyState();
+    runCode(); // This runs the initial code to show in preview
 });

@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scriptly - Interactive Code Playground</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
+            color: #e0e8f0;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, #2a3f5f 0%, #1e2d4a 100%);
+            padding: 15px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #4a6fa5;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .logo-home {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #a8d5f5;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            font-size: 32px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 12px 32px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6fa5d4 0%, #5a8fbe 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(111, 165, 212, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 24px rgba(111, 165, 212, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #b8a8e8 0%, #9b87d6 100%);
+            color: #1a1f3a;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(184, 168, 232, 0.4);
+        }
+
+        .btn-large {
+            font-size: 18px;
+            padding: 16px 48px;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .bg-circles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 0;
+        }
+
+        .circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(168, 213, 245, 0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .circle:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .circle:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            bottom: 10%;
+            left: 50%;
+            animation-delay: 4s;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 1;
+            max-width: 800px;
+            padding: 40px;
+        }
+
+        .hero-title {
+            font-size: 64px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #a8d5f5 0%, #b8a8e8 50%, #d4a5c4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .hero-subtitle {
+            font-size: 20px;
+            color: #8ca5c5;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .features-section {
+            padding: 80px 40px;
+            background: linear-gradient(135deg, #0f1729 0%, #1a1f3a 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 42px;
+            color: #a8d5f5;
+            margin-bottom: 20px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            font-size: 18px;
+            color: #8ca5c5;
+            margin-bottom: 60px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #2a3f5f 0%, #1e2d4a 100%);
+            border: 2px solid #4a6fa5;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(74, 111, 165, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .feature-title {
+            font-size: 20px;
+            color: #a8d5f5;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .feature-desc {
+            color: #8ca5c5;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .cta-section {
+            padding: 100px 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #2a3f5f 0%, #1e2d4a 100%);
+            border-top: 2px solid #4a6fa5;
+        }
+
+        .cta-title {
+            font-size: 48px;
+            color: #a8d5f5;
+            margin-bottom: 20px;
+        }
+
+        .cta-text {
+            font-size: 20px;
+            color: #8ca5c5;
+            margin-bottom: 40px;
+        }
+
+        .footer {
+            background: #0a0f1a;
+            padding: 30px 40px;
+            text-align: center;
+            border-top: 2px solid #2a3f5f;
+            color: #4a6fa5;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="home.html" class="logo-home">
+            <span class="logo-icon">⚡</span>
+            Scriptly
+        </a>
+        <div class="nav-buttons">
+            <a href="ide.html" class="btn btn-secondary">Launch IDE</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="bg-circles">
+            <div class="circle"></div>
+            <div class="circle"></div>
+            <div class="circle"></div>
+        </div>
+        <div class="hero-content">
+            <h1 class="hero-title">Code. Create. Deploy.</h1>
+            <p class="hero-subtitle">
+                A powerful online IDE for HTML, CSS, and JavaScript.<br>
+                Build stunning projects with live preview and instant feedback.
+            </p>
+            <a href="ide.html" class="btn btn-primary btn-large">🚀 Start Coding Now</a>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container">
+            <h2 class="section-title">Why Choose Scriptly?</h2>
+            <p class="section-subtitle">Everything you need to build amazing web projects</p>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3 class="feature-title">Lightning Fast</h3>
+                    <p class="feature-desc">Instant live preview as you type. No delays, no waiting.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎨</div>
+                    <h3 class="feature-title">Beautiful Editor</h3>
+                    <p class="feature-desc">Syntax highlighting, auto-complete, and smooth animations.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💾</div>
+                    <h3 class="feature-title">Auto-Save</h3>
+                    <p class="feature-desc">Never lose your work. Automatic saving every 5 seconds.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔧</div>
+                    <h3 class="feature-title">Resizable Panels</h3>
+                    <p class="feature-desc">Customize your workspace. Drag to resize editor and console.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⌨️</div>
+                    <h3 class="feature-title">Keyboard Shortcuts</h3>
+                    <p class="feature-desc">Work faster with powerful shortcuts. Ctrl+Enter to run code.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📟</div>
+                    <h3 class="feature-title">Smart Console</h3>
+                    <p class="feature-desc">Track logs, warnings, and errors with timestamps.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💡</div>
+                    <h3 class="feature-title">Live Status Bar</h3>
+                    <p class="feature-desc">See line numbers, cursor position, and active language.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3 class="feature-title">Auto-Run Toggle</h3>
+                    <p class="feature-desc">Choose automatic or manual code execution.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📤</div>
+                    <h3 class="feature-title">Export Projects</h3>
+                    <p class="feature-desc">Download your projects as standalone HTML files.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2 class="cta-title">Ready to Start Building?</h2>
+        <p class="cta-text">Join thousands of developers using Scriptly to create amazing projects</p>
+        <a href="ide.html" class="btn btn-primary btn-large">Launch IDE →</a>
+    </section>
+
+    <footer class="footer">
+        <p>© 2026 Scriptly - Write. Run. Preview. | Made with 💙 for developers | Author - Shreeja Hebbar </p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Interactive Code Playground</title>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Interactive Code Portfolio</div>
+        <div class="toolbar">
+            <button class="btn btn-dark" onclick="toggleDarkMode()">🌙</button>
+            <button class="btn btn-purple" onclick="saveCode()">💾 Save</button>
+            <button class="btn btn-pink" onclick="loadCode()">📁 Load</button>
+            <button class="btn btn-blue" onclick="exportCode()">📤 Export</button>
+            <button class="btn btn-yellow" onclick="toggleShortcuts()">⌨️ Shortcuts</button>
+            <button class="btn btn-dark" onclick="clearCode()">🗑️ Clear</button>
+            <button class="btn btn-run" onclick="runCode()">▶️ Run</button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <div class="editor-section">
+            <div class="tabs">
+                <div class="tab active" data-lang="html">📄 HTML</div>
+                <div class="tab" data-lang="css">🎨 CSS</div>
+                <div class="tab" data-lang="js">⚡ JavaScript</div>
+            </div>
+            <div class="editor-container">
+                <div class="empty-state" id="emptyState">
+                    <h3>👋 Welcome to Scriptly</h3>
+                    <p>Start typing HTML, CSS, or JavaScript<br>to see live preview.</p>
+                </div>
+                <textarea class="editor" id="htmlEditor" spellcheck="false"><h1 id="hi">Hello world!</h1></textarea>
+                <textarea class="editor" id="cssEditor" style="display:none;" spellcheck="false">body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: linear-gradient(135deg, #fda4af 0%, #c4b5fd 100%);
+}
+
+h1 {
+  color: #1a1a1a;
+  font-size: 48px;
+}</textarea>
+                <textarea class="editor" id="jsEditor" style="display:none;" spellcheck="false">// Add your JavaScript here
+console.log('Hello from the console!');</textarea>
+            </div>
+            <div class="console">
+                <div class="console-resizer" id="consoleResizer"></div>
+                <div class="console-header">
+                    <div class="console-title">📟 Console</div>
+                    <button class="clear-console" onclick="clearConsole()">Clear</button>
+                </div>
+                <div id="consoleOutput"></div>
+            </div>
+        </div>
+
+        <div class="resizer" id="resizer"></div>
+
+        <div class="preview-section">
+            <div class="preview-header">
+                Live Preview
+            </div>
+            <div class="preview-container">
+                <iframe class="preview-frame" id="preview"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keyboard Shortcuts Modal -->
+    <div class="shortcuts-modal" id="shortcutsModal">
+        <div class="shortcuts-content">
+            <h2>⌨️ Keyboard Shortcuts</h2>
+            <div class="shortcut-item">
+                <span>Run Code</span>
+                <span class="shortcut-key">Ctrl + Enter</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Save Project</span>
+                <span class="shortcut-key">Ctrl + S</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Load Project</span>
+                <span class="shortcut-key">Ctrl + O</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Clear Console</span>
+                <span class="shortcut-key">Ctrl + L</span>
+            </div>
+            <div class="shortcut-item">
+                <span>Show Shortcuts</span>
+                <span class="shortcut-key">Ctrl + /</span>
+            </div>
+            <button class="close-shortcuts" onclick="toggleShortcuts()">Close</button>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <div class="status-left">
+            <div class="status-item">
+                <strong id="currentLang">HTML</strong>
+            </div>
+            <div class="status-item">
+                Line <strong id="lineNum">1</strong>, Col <strong id="colNum">1</strong>
+            </div>
+            <div class="status-item">
+                Lines: <strong id="lineCount">1</strong>
+            </div>
+            <div class="status-item">
+                Chars: <strong id="charCount">28</strong>
+            </div>
+        </div>
+        <div class="status-right">
+            <div class="auto-run-toggle" onclick="toggleAutoRun()">
+                <span id="autoRunLabel">Auto Run</span>
+                <div class="toggle-switch active" id="autoRunSwitch">
+                    <div class="toggle-slider"></div>
+                </div>
+            </div>
+            <div class="status-item">
+                <span id="autoSaveStatus">Auto-save: ON</span>
+            </div>
+            <div class="status-item">UTF-8</div>
+            <div class="ready-indicator">READY</div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
