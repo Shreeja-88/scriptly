@@ -1,342 +1,312 @@
-/* ==================== Global Variables ==================== */
-let htmlEditor, cssEditor, jsEditor;
-let currentTab = 'html';
-let autoSaveTimeout;
-let errorMarker = null;
-
-/* ==================== Initialize Editors ==================== */
-function initializeEditors() {
-    htmlEditor = CodeMirror.fromTextArea(document.getElementById('html-editor'), {
-        mode: 'htmlmixed',
-        theme: 'monokai',
-        lineNumbers: true,
-        autoCloseTags: true,
-        autoCloseBrackets: true,
-        matchBrackets: true,
-        lineWrapping: true
-    });
-
-    cssEditor = CodeMirror.fromTextArea(document.getElementById('css-editor'), {
-        mode: 'css',
-        theme: 'monokai',
-        lineNumbers: true,
-        autoCloseBrackets: true,
-        lineWrapping: true
-    });
-
-    jsEditor = CodeMirror.fromTextArea(document.getElementById('js-editor'), {
-        mode: 'javascript',
-        theme: 'monokai',
-        lineNumbers: true,
-        autoCloseBrackets: true,
-        matchBrackets: true,
-        lineWrapping: true
-    });
-
-    cssEditor.getWrapperElement().style.display = 'none';
-    jsEditor.getWrapperElement().style.display = 'none';
-
-    htmlEditor.on('change', handleEditorChange);
-    cssEditor.on('change', handleEditorChange);
-    jsEditor.on('change', handleEditorChange);
-}
-
-/* ==================== Editor Change ==================== */
-function handleEditorChange() {
-    clearTimeout(autoSaveTimeout);
-    autoSaveTimeout = setTimeout(() => {
-        autoSave();
-        runCode();
-        updateStats();
-    }, 1000);
-}
-
-/* ==================== Tabs ==================== */
-function switchTab(tab) {
-    currentTab = tab;
-
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
-
-    htmlEditor.getWrapperElement().style.display = tab === 'html' ? 'block' : 'none';
-    cssEditor.getWrapperElement().style.display = tab === 'css' ? 'block' : 'none';
-    jsEditor.getWrapperElement().style.display = tab === 'js' ? 'block' : 'none';
-
-    htmlEditor.refresh();
-    cssEditor.refresh();
-    jsEditor.refresh();
-}
-
-/* ==================== Console ==================== */
-function addConsoleMessage(type, args) {
-    const output = document.getElementById('consoleOutput');
-    const msg = document.createElement('div');
-
-    msg.className = `console-message ${type}`;
-    msg.textContent =
-        '> ' +
-        args.map(a => (typeof a === 'object' ? JSON.stringify(a) : String(a))).join(' ');
-
-    output.appendChild(msg);
-    output.scrollTop = output.scrollHeight;
-}
-
-function clearConsole() {
-    document.getElementById('consoleOutput').innerHTML = '';
-}
-
-/* ==================== Run Code ==================== */
-function runCode() {
+// Wait for DOM to be fully loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Get editor elements
+    const htmlEditor = document.getElementById('htmlEditor');
+    const cssEditor = document.getElementById('cssEditor');
+    const jsEditor = document.getElementById('jsEditor');
     const preview = document.getElementById('preview');
-    clearConsole();
+    const tabs = document.querySelectorAll('.tab');
+    const editors = [htmlEditor, cssEditor, jsEditor];
+    let currentEditor = htmlEditor;
 
-    if (errorMarker) {
-        errorMarker.clear();
-        errorMarker = null;
+    // Tab switching functionality
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs
+            tabs.forEach(t => t.classList.remove('active'));
+            // Add active class to clicked tab
+            tab.classList.add('active');
+            
+            // Hide all editors
+            editors.forEach(e => e.style.display = 'none');
+            
+            // Show selected editor
+            const lang = tab.dataset.lang;
+            if (lang === 'html') currentEditor = htmlEditor;
+            else if (lang === 'css') currentEditor = cssEditor;
+            else if (lang === 'js') currentEditor = jsEditor;
+            
+            currentEditor.style.display = 'block';
+            updateStats();
+        });
+    });
+
+    // Run code and update preview
+    function runCode() {
+        const html = htmlEditor.value;
+        const css = cssEditor.value;
+        const js = jsEditor.value;
+
+        // Create the preview document with console capture
+        const output = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>${css}</style>
+            </head>
+            <body>
+                ${html}
+                <script>
+                    // Capture console output and send to parent
+                    (function() {
+                        const originalLog = console.log;
+                        const originalError = console.error;
+                        const originalWarn = console.warn;
+                        
+                        console.log = function(...args) {
+                            window.parent.postMessage({
+                                type: 'console',
+                                method: 'log',
+                                args: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg))
+                            }, '*');
+                            originalLog.apply(console, args);
+                        };
+                        
+                        console.error = function(...args) {
+                            window.parent.postMessage({
+                                type: 'console',
+                                method: 'error',
+                                args: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg))
+                            }, '*');
+                            originalError.apply(console, args);
+                        };
+                        
+                        console.warn = function(...args) {
+                            window.parent.postMessage({
+                                type: 'console',
+                                method: 'warn',
+                                args: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg))
+                            }, '*');
+                            originalWarn.apply(console, args);
+                        };
+                        
+                        // Catch runtime errors
+                        window.onerror = function(msg, url, line, col, error) {
+                            window.parent.postMessage({
+                                type: 'console',
+                                method: 'error',
+                                args: ['Error: ' + msg + ' (Line ' + line + ')']
+                            }, '*');
+                            return false;
+                        };
+                    })();
+                    
+                    try {
+                        ${js}
+                    } catch(e) {
+                        console.error(e.message);
+                    }
+                <\/script>
+            </body>
+            </html>
+        `;
+
+        preview.srcdoc = output;
+        updateLastSaved();
     }
 
-    const content = `
-<!DOCTYPE html>
-<html>
+    // Make runCode available globally
+    window.runCode = runCode;
+
+    // Save functionality
+    function saveCode() {
+        const code = {
+            html: htmlEditor.value,
+            css: cssEditor.value,
+            js: jsEditor.value,
+            timestamp: new Date().toISOString()
+        };
+        localStorage.setItem('savedCode', JSON.stringify(code));
+        alert('💾 Code saved successfully!');
+    }
+    window.saveCode = saveCode;
+
+    // Load functionality
+    function loadCode() {
+        const savedCode = localStorage.getItem('savedCode');
+        if (savedCode) {
+            const code = JSON.parse(savedCode);
+            htmlEditor.value = code.html;
+            cssEditor.value = code.css;
+            jsEditor.value = code.js;
+            runCode();
+            updateStats();
+            alert('📁 Code loaded successfully!');
+        } else {
+            alert('❌ No saved code found!');
+        }
+    }
+    window.loadCode = loadCode;
+
+    // Export functionality
+    function exportCode() {
+        const html = htmlEditor.value;
+        const css = cssEditor.value;
+        const js = jsEditor.value;
+
+        const fullHTML = `<!DOCTYPE html>
+<html lang="en">
 <head>
-<style>${cssEditor.getValue()}</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exported Code</title>
+    <style>
+${css}
+    </style>
 </head>
 <body>
-${htmlEditor.getValue()}
-
-<script>
-(function(){
-    function send(type, args){
-        parent.postMessage({ type, args }, '*');
-    }
-
-    console.log = (...args) => send('log', args);
-    console.warn = (...args) => send('warn', args);
-    console.error = (...args) => send('error', args);
-
-    try {
-${jsEditor.getValue()}
-    } catch (e) {
-        send('error', [e.message, e.stack]);
-        throw e;
-    }
-})();
-<\/script>
+${html}
+    <script>
+${js}
+    </script>
 </body>
-</html>
-`;
+</html>`;
 
-    preview.srcdoc = content;
-    updateStatus('Running...', false);
-
-    setTimeout(() => updateStatus('Ready', false), 400);
-}
-
-/* ==================== Console Listener ==================== */
-window.addEventListener('message', e => {
-    if (!e.data || !e.data.type) return;
-
-    addConsoleMessage(e.data.type, e.data.args);
-
-    if (e.data.type === 'error' && e.data.args[1]) {
-        highlightJsError(e.data.args[1]);
-        updateStatus('Error', true);
+        const blob = new Blob([fullHTML], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'code-portfolio.html';
+        a.click();
+        URL.revokeObjectURL(url);
+        alert('📤 Code exported successfully!');
     }
-});
+    window.exportCode = exportCode;
 
-/* ==================== Error Highlight ==================== */
-function highlightJsError(stack) {
-    const match = stack.match(/<anonymous>:(\d+):(\d+)/);
-    if (!match) return;
+    // Share functionality
+    function shareCode() {
+        const code = {
+            html: htmlEditor.value,
+            css: cssEditor.value,
+            js: jsEditor.value
+        };
+        const encoded = btoa(JSON.stringify(code));
+        const shareUrl = `${window.location.origin}${window.location.pathname}?code=${encoded}`;
+        
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            alert('🔗 Share link copied to clipboard!');
+        }).catch(() => {
+            prompt('Copy this link to share:', shareUrl);
+        });
+    }
+    window.shareCode = shareCode;
 
-    const line = parseInt(match[1], 10) - 1;
+    // Clear functionality
+    function clearCode() {
+        if (confirm('⚠️ Are you sure you want to clear all code?')) {
+            htmlEditor.value = '';
+            cssEditor.value = '';
+            jsEditor.value = '';
+            runCode();
+            updateStats();
+            clearConsole();
+            alert('🗑️ All code cleared!');
+        }
+    }
+    window.clearCode = clearCode;
 
-    if (errorMarker) errorMarker.clear();
+    // Toggle dark mode
+    function toggleDarkMode() {
+        document.body.classList.toggle('light-mode');
+        alert('🌙 Dark mode toggle - Feature coming soon!');
+    }
+    window.toggleDarkMode = toggleDarkMode;
 
-    errorMarker = jsEditor.markText(
-        { line, ch: 0 },
-        { line, ch: 100 },
-        { className: 'cm-error-line' }
-    );
+    // Listen for console messages from iframe
+    window.addEventListener('message', (event) => {
+        if (event.data.type === 'console') {
+            addConsoleMessage(event.data.method, event.data.args);
+        }
+    });
 
-    jsEditor.focus();
-    jsEditor.setCursor({ line, ch: 0 });
-}
+    // Add message to console
+    function addConsoleMessage(method, args) {
+        const consoleOutput = document.getElementById('consoleOutput');
+        const message = document.createElement('div');
+        message.style.marginBottom = '8px';
+        message.style.padding = '4px 0';
+        
+        // Style based on console method
+        if (method === 'error') {
+            message.style.color = '#fda4af';
+            message.textContent = '❌ ' + args.join(' ');
+        } else if (method === 'warn') {
+            message.style.color = '#fde68a';
+            message.textContent = '⚠️ ' + args.join(' ');
+        } else {
+            message.style.color = '#86efac';
+            message.textContent = '> ' + args.join(' ');
+        }
+        
+        consoleOutput.appendChild(message);
+        consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
 
-/* ==================== Storage ==================== */
-function autoSave() {
-    localStorage.setItem('codePortfolio', JSON.stringify({
-        html: htmlEditor.getValue(),
-        css: cssEditor.getValue(),
-        js: jsEditor.getValue(),
-        timestamp: new Date().toISOString()
-    }));
-    updateTimestamp();
-}
+    // Update line and character count
+    function updateStats() {
+        const content = currentEditor.value;
+        const lines = content.split('\n').length;
+        const chars = content.length;
+        
+        document.getElementById('lineCount').textContent = lines;
+        document.getElementById('charCount').textContent = chars;
+    }
 
-function saveCode() {
-    autoSave();
-    updateStatus('Saved!', false);
-}
+    // Update last saved timestamp
+    function updateLastSaved() {
+        const now = new Date();
+        const time = now.toLocaleTimeString('en-US', { 
+            hour: 'numeric', 
+            minute: '2-digit', 
+            second: '2-digit',
+            hour12: true 
+        });
+        document.getElementById('lastSaved').textContent = time;
+    }
 
-function loadCode() {
-    const saved = localStorage.getItem('codePortfolio');
-    if (!saved) return;
+    // Clear console output
+    function clearConsole() {
+        document.getElementById('consoleOutput').innerHTML = '';
+    }
 
-    const data = JSON.parse(saved);
-    htmlEditor.setValue(data.html || '');
-    cssEditor.setValue(data.css || '');
-    jsEditor.setValue(data.js || '');
+    // Make clearConsole available globally
+    window.clearConsole = clearConsole;
+
+    // Auto-run on input with debouncing
+    let autoRunTimeout;
+    editors.forEach(editor => {
+        editor.addEventListener('input', () => {
+            updateStats();
+            
+            // Debounce auto-run to avoid excessive updates
+            clearTimeout(autoRunTimeout);
+            autoRunTimeout = setTimeout(() => {
+                runCode();
+            }, 500);
+        });
+    });
+
+    // Auto-save functionality (simulated)
+    setInterval(() => {
+        updateLastSaved();
+    }, 1000);
+
+    // Check for shared code in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const sharedCode = urlParams.get('code');
+    if (sharedCode) {
+        try {
+            const code = JSON.parse(atob(sharedCode));
+            htmlEditor.value = code.html;
+            cssEditor.value = code.css;
+            jsEditor.value = code.js;
+            alert('📥 Shared code loaded successfully!');
+        } catch (e) {
+            console.error('Failed to load shared code');
+        }
+    }
+
+    // Initial run
     runCode();
-}
-
-/* ==================== Export ==================== */
-function exportCode() {
-    const blob = new Blob([`
-<!DOCTYPE html>
-<html>
-<head><style>${cssEditor.getValue()}</style></head>
-<body>
-${htmlEditor.getValue()}
-<script>${jsEditor.getValue()}<\/script>
-</body>
-</html>`], { type: 'text/html' });
-
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'project.html';
-    a.click();
-}
-
-/* ==================== Share ==================== */
-function shareCode() {
-    const data = {
-        html: htmlEditor.getValue(),
-        css: cssEditor.getValue(),
-        js: jsEditor.getValue()
-    };
-
-    const encoded = btoa(encodeURIComponent(JSON.stringify(data)));
-    const url = `${location.origin}${location.pathname}?code=${encoded}`;
-
-    navigator.clipboard.writeText(url);
-    updateStatus('Link Copied!', false);
-}
-
-/* ==================== Load Shared ==================== */
-function loadSharedCode() {
-    const params = new URLSearchParams(location.search);
-    if (!params.has('code')) return;
-
-    try {
-        const data = JSON.parse(decodeURIComponent(atob(params.get('code'))));
-        htmlEditor.setValue(data.html || '');
-        cssEditor.setValue(data.css || '');
-        jsEditor.setValue(data.js || '');
-        runCode();
-    } catch {}
-}
-
-/* ==================== Theme ==================== */
-function toggleTheme() {
-    document.body.classList.toggle('light-theme');
-    const light = document.body.classList.contains('light-theme');
-    const theme = light ? 'eclipse' : 'monokai';
-
-    htmlEditor.setOption('theme', theme);
-    cssEditor.setOption('theme', theme);
-    jsEditor.setOption('theme', theme);
-
-    document.getElementById('themeIcon').textContent = light ? '☀️' : '🌙';
-}
-
-/* ==================== Stats ==================== */
-function updateStats() {
-    const html = htmlEditor.getValue();
-    const css = cssEditor.getValue();
-    const js = jsEditor.getValue();
-
-    document.getElementById('charCount').textContent =
-        (html.length + css.length + js.length).toLocaleString();
-
-    document.getElementById('lineCount').textContent =
-        (html.split('\n').length + css.split('\n').length + js.split('\n').length).toLocaleString();
-}
-
-function updateTimestamp() {
-    const saved = localStorage.getItem('codePortfolio');
-    if (!saved) return;
-
-    const t = new Date(JSON.parse(saved).timestamp);
-    document.getElementById('timestamp').textContent = t.toLocaleTimeString();
-}
-
-function updateStatus(msg, err) {
-    const s = document.getElementById('status');
-    s.textContent = msg;
-    s.className = 'status' + (err ? ' error' : '');
-}
-
-/* ==================== Templates ==================== */
-const templates = {
-    blank: { html: '', css: '', js: '' }
-};
-
-function loadTemplate(name) {
-    const t = templates[name];
-    if (!t) return;
-
-    htmlEditor.setValue(t.html);
-    cssEditor.setValue(t.css);
-    jsEditor.setValue(t.js);
-    runCode();
-    closeModal('templateModal');
-}
-
-/* ==================== Modals ==================== */
-function openModal(id) {
-    document.getElementById(id).classList.add('active');
-}
-
-function closeModal(id) {
-    document.getElementById(id).classList.remove('active');
-}
-
-/* ==================== Init ==================== */
-document.addEventListener('DOMContentLoaded', () => {
-    initializeEditors();
-
-    loadSharedCode();
-    loadCode();
     updateStats();
-
-    document.querySelectorAll('.tab').forEach(tab =>
-        tab.onclick = () => switchTab(tab.dataset.tab)
-    );
-
-    document.getElementById('runBtn').onclick = runCode;
-    document.getElementById('saveBtn').onclick = saveCode;
-    document.getElementById('loadBtn').onclick = loadCode;
-    document.getElementById('exportBtn').onclick = exportCode;
-    document.getElementById('shareBtn').onclick = shareCode;
-    document.getElementById('clearBtn').onclick = () => {
-        htmlEditor.setValue('');
-        cssEditor.setValue('');
-        jsEditor.setValue('');
-        runCode();
-    };
-
-    document.getElementById('themeToggle').onclick = toggleTheme;
-    document.getElementById('templateBtn').onclick = () => openModal('templateModal');
-    document.getElementById('clearConsole').onclick = clearConsole;
-
-    document.querySelectorAll('.close').forEach(c =>
-        c.onclick = () => closeModal(c.closest('.modal').id)
-    );
-
-    document.querySelectorAll('.template-card').forEach(card =>
-        card.onclick = () => loadTemplate(card.dataset.template)
-    );
-
-    setInterval(autoSave, 30000);
 });
