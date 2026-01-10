@@ -4,36 +4,35 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>Interactive Code Portfolio</title>
+    <title>⚡Scriptly</title>
 </head>
 <body>
+    <div class ="app">
     <div class="header">
-        <div class="logo">Interactive Code Portfolio</div>
+        <div class="logo">Scriptly — Interactive Code Playground</div>
         <div class="toolbar">
-            <button class="btn btn-dark" onclick="toggleDarkMode()">🌙</button>
-            <button class="btn btn-purple" onclick="saveCode()">💾 Save</button>
-            <button class="btn btn-pink" onclick="loadCode()">📁 Load</button>
-            <button class="btn btn-blue" onclick="exportCode()">📤 Export</button>
-            <button class="btn btn-yellow" onclick="shareCode()">🔗 Share</button>
-            <button class="btn btn-dark" onclick="clearCode()">🗑️ Clear</button>
-            <button class="btn btn-run" onclick="runCode()">▶️ Run</button>
+            <button class="btn btn-purple" onclick="saveCode()">Save</button>
+            <button class="btn btn-pink" onclick="loadCode()">Load</button>
+            <button class="btn btn-blue" onclick="exportCode()">Export</button>
+            <button class="btn btn-yellow" onclick="shareCode()">Share</button>
+            <button class="btn btn-dark" onclick="clearCode()">Clear</button>
+            <button class="btn btn-run" onclick="runCode()">▶Run</button>
         </div>
     </div>
 
     <div class="main-container">
         <div class="editor-section">
             <div class="tabs">
-                <div class="tab active" data-lang="html">📄 HTML</div>
-                <div class="tab" data-lang="css">🎨 CSS</div>
-                <div class="tab" data-lang="js">⚡ JavaScript</div>
+                <div class="tab active" data-lang="html">HTML</div>
+                <div class="tab" data-lang="css">CSS</div>
+                <div class="tab" data-lang="js">JavaScript</div>
             </div>
             <div class="editor-container">
                 <textarea class="editor" id="htmlEditor" spellcheck="false"><h1 id="hi">Hello world!</h1></textarea>
                 <textarea class="editor" id="cssEditor" style="display:none;" spellcheck="false">body {
   font-family: Arial, sans-serif;
   padding: 20px;
-  background: linear-gradient(135deg, #fda4af 0%, #c4b5fd 100%);
-}
+  background-color: #f0f0f0;}
 
 h1 {
   color: #1a1a1a;
@@ -44,7 +43,7 @@ console.log('Hello from the console!');</textarea>
             </div>
             <div class="console">
                 <div class="console-header">
-                    <div class="console-title">📟 Console</div>
+                    <div class="console-title">Console</div>
                     <button class="clear-console" onclick="clearConsole()">Clear</button>
                 </div>
                 <div id="consoleOutput"></div>
@@ -62,13 +61,14 @@ console.log('Hello from the console!');</textarea>
     </div>
 
     <div class="status-bar">
-        <div class="status-item">💡 Tip: Your code auto-saves every second</div>
-        <div style="display: flex; gap: 20px;">
-            <div class="status-item">Last saved: <span id="lastSaved">12:50:53 PM</span></div>
-            <div class="status-item">Lines: <span id="lineCount">6</span></div>
-            <div class="status-item">Characters: <span id="charCount">69</span></div>
+        <div class="status-item">💡 Tip: Click Run to see your code in action</div>
+        <div style="display: flex; gap: 20px; align-items: center;">
+            <div class="status-item">Last updated: <span id="lastSaved">--:--:-- --</span></div>
+            <div class="status-item">Lines: <span id="lineCount">1</span></div>
+            <div class="status-item">Characters: <span id="charCount">28</span></div>
             <div class="ready-indicator">READY</div>
         </div>
+    </div>
     </div>
 
     <script src="js/app.js"></script>

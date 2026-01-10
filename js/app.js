@@ -37,6 +37,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const css = cssEditor.value;
         const js = jsEditor.value;
 
+        // Show loading animation
+        const previewContainer = document.querySelector('.preview-container');
+        previewContainer.classList.add('loading');
+        
+        setTimeout(() => {
+            previewContainer.classList.remove('loading');
+        }, 600);
+
         // Create the preview document with console capture
         const output = `
             <!DOCTYPE html>
@@ -117,7 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
             timestamp: new Date().toISOString()
         };
         localStorage.setItem('savedCode', JSON.stringify(code));
-        alert('💾 Code saved successfully!');
+        alert('Code saved successfully!');
     }
     window.saveCode = saveCode;
 
@@ -131,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
             jsEditor.value = code.js;
             runCode();
             updateStats();
-            alert('📁 Code loaded successfully!');
+            alert('Code loaded successfully!');
         } else {
             alert('❌ No saved code found!');
         }
@@ -193,24 +201,17 @@ ${js}
 
     // Clear functionality
     function clearCode() {
-        if (confirm('⚠️ Are you sure you want to clear all code?')) {
+        if (confirm('Are you sure you want to clear all code?')) {
             htmlEditor.value = '';
             cssEditor.value = '';
             jsEditor.value = '';
             runCode();
             updateStats();
             clearConsole();
-            alert('🗑️ All code cleared!');
+            alert('All code cleared!');
         }
     }
     window.clearCode = clearCode;
-
-    // Toggle dark mode
-    function toggleDarkMode() {
-        document.body.classList.toggle('light-mode');
-        alert('🌙 Dark mode toggle - Feature coming soon!');
-    }
-    window.toggleDarkMode = toggleDarkMode;
 
     // Listen for console messages from iframe
     window.addEventListener('message', (event) => {
@@ -272,17 +273,10 @@ ${js}
     // Make clearConsole available globally
     window.clearConsole = clearConsole;
 
-    // Auto-run on input with debouncing
-    let autoRunTimeout;
+    // Update stats on input (no auto-run)
     editors.forEach(editor => {
         editor.addEventListener('input', () => {
             updateStats();
-            
-            // Debounce auto-run to avoid excessive updates
-            clearTimeout(autoRunTimeout);
-            autoRunTimeout = setTimeout(() => {
-                runCode();
-            }, 500);
         });
     });
 
@@ -300,7 +294,7 @@ ${js}
             htmlEditor.value = code.html;
             cssEditor.value = code.css;
             jsEditor.value = code.js;
-            alert('📥 Shared code loaded successfully!');
+            alert('Shared code loaded successfully!');
         } catch (e) {
             console.error('Failed to load shared code');
         }
