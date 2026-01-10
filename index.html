@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Portfolio - Interactive IDE</title>
+    
+    <!-- CodeMirror CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/eclipse.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1>⚡ Interactive Code Portfolio</h1>
+        </div>
+        <div class="header-controls">
+            <button class="btn btn-secondary" id="themeToggle" title="Toggle Theme">
+                <span id="themeIcon">🌙</span>
+            </button>
+            <button class="btn btn-secondary" id="templateBtn" title="Load Template">
+                📋 Templates
+            </button>
+            <button class="btn btn-secondary" id="saveBtn" title="Save Code">
+                💾 Save
+            </button>
+            <button class="btn btn-secondary" id="loadBtn" title="Load Code">
+                📂 Load
+            </button>
+            <button class="btn btn-secondary" id="exportBtn" title="Export HTML">
+                ⬇️ Export
+            </button>
+            <button class="btn btn-secondary" id="shareBtn" title="Share Code">
+                🔗 Share
+            </button>
+            <button class="btn btn-secondary" id="clearBtn" title="Clear All">
+                🗑️ Clear
+            </button>
+            <button class="btn btn-primary" id="runBtn" title="Run Code">
+                ▶️ Run
+            </button>
+        </div>
+    </header>
+
+    <!-- Template Modal -->
+    <div id="templateModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Choose a Template</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="template-grid">
+                    <div class="template-card" data-template="blank">
+                        <h3>📄 Blank</h3>
+                        <p>Start from scratch</p>
+                    </div>
+                    <div class="template-card" data-template="portfolio">
+                        <h3>💼 Portfolio</h3>
+                        <p>Personal portfolio template</p>
+                    </div>
+                    <div class="template-card" data-template="landing">
+                        <h3>🚀 Landing Page</h3>
+                        <p>Product landing page</p>
+                    </div>
+                    <div class="template-card" data-template="dashboard">
+                        <h3>📊 Dashboard</h3>
+                        <p>Analytics dashboard</p>
+                    </div>
+                    <div class="template-card" data-template="blog">
+                        <h3>📝 Blog</h3>
+                        <p>Blog post layout</p>
+                    </div>
+                    <div class="template-card" data-template="calculator">
+                        <h3>🔢 Calculator</h3>
+                        <p>Interactive calculator</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Modal -->
+    <div id="projectsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>My Projects</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="projects-list" id="projectsList">
+                    <!-- Projects will be loaded here -->
+                </div>
+                <div class="project-actions">
+                    <input type="text" id="projectName" placeholder="Enter project name..." class="input-field">
+                    <button class="btn btn-primary" id="saveProjectBtn">Save as New Project</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Editor Section -->
+        <div class="editor-section">
+            <div class="tabs">
+                <div class="tab active" data-tab="html">
+                    <span class="tab-icon">📄</span> HTML
+                </div>
+                <div class="tab" data-tab="css">
+                    <span class="tab-icon">🎨</span> CSS
+                </div>
+                <div class="tab" data-tab="js">
+                    <span class="tab-icon">⚡</span> JavaScript
+                </div>
+            </div>
+            <div class="editor-container">
+                <textarea id="html-editor" class="editor"></textarea>
+                <textarea id="css-editor" class="editor"></textarea>
+                <textarea id="js-editor" class="editor"></textarea>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="preview-section">
+            <div class="preview-header">
+                <h2>
+                    <span class="preview-icon">👁️</span> Live Preview
+                </h2>
+                <div class="preview-controls">
+                    <button class="btn-icon" id="refreshPreview" title="Refresh Preview">🔄</button>
+                    <button class="btn-icon" id="fullscreenBtn" title="Fullscreen">⛶</button>
+                    <span class="status" id="status">Ready</span>
+                </div>
+            </div>
+            <iframe id="preview"></iframe>
+            
+            <!-- Console Panel -->
+            <div class="console-panel" id="consolePanel">
+                <div class="console-header">
+                    <span>📟 Console</span>
+                    <button class="btn-icon" id="clearConsole">Clear</button>
+                </div>
+                <div class="console-output" id="consoleOutput"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-left">
+            <span>💡 <strong>Tip:</strong> Your code auto-saves every second</span>
+        </div>
+        <div class="footer-right">
+            <span>Last saved: <span id="timestamp">Never</span></span>
+            <span class="separator">|</span>
+            <span>Lines: <span id="lineCount">0</span></span>
+            <span class="separator">|</span>
+            <span>Characters: <span id="charCount">0</span></span>
+        </div>
+    </footer>
+
+    <!-- CodeMirror JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="js/app.js"></script>
+</body>
+</html>

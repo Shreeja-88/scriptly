@@ -1,0 +1,64 @@
+# ------------------------
+# OS files
+# ------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ------------------------
+# Editor / IDE settings
+# ------------------------
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# ------------------------
+# Logs
+# ------------------------
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ------------------------
+# Dependency folders
+# ------------------------
+node_modules/
+
+# ------------------------
+# Build / dist folders
+# ------------------------
+.dist/
+build/
+.out/
+.cache/
+
+# ------------------------
+# Environment files
+# ------------------------
+.env
+.env.local
+.env.development
+.env.production
+
+# ------------------------
+# Testing / coverage
+# ------------------------
+coverage/
+
+# ------------------------
+# Temporary files
+# ------------------------
+*.tmp
+*.swp
+*.bak
+
+# ------------------------
+# Minified files (optional)
+# Ignore if you auto-generate them
+# ------------------------
+*.min.css
+*.min.js
