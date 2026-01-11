@@ -5,8 +5,13 @@
 It is designed to feel like a real developer tool — fast, minimal, and intuitive.
 
 ---
+## Live Demo
 
-## Features🚀 
+🔗 **https://shreeja-88.github.io/scriptly/**
+
+---
+
+## Features
 
 ### Interactive IDE
 - Separate editors for **HTML**, **CSS**, and **JavaScript**
@@ -30,14 +35,6 @@ It is designed to feel like a real developer tool — fast, minimal, and intuiti
 - Keyboard shortcut support (planned)
 - Auto-save and export-ready structure
 - Clean, readable vanilla JavaScript code
-
----
-
-## Preview
-
-> Landing page with animated hero section and interactive IDE layout.
-
-(Add a screenshot here later as `assets/preview.png`)
 
 ---
 
