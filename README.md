@@ -52,7 +52,7 @@ It is designed to feel like a real developer tool — fast, minimal, and intuiti
 ```
 scriptly/
 │
-├── home.html # Landing page
+├── index.html # Landing page
 ├── ide.html # Interactive IDE
 ├── style.css # Global styles
 ├── script.js # IDE logic
