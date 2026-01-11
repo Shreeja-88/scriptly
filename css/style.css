@@ -286,25 +286,25 @@ body.light-mode .empty-state p {
 }
 
 .btn-pink { 
-    background: linear-gradient(135deg, #d4a5c4 0%, #c48bb4 100%);
+    background: linear-gradient(135deg, #b8a8e8 0%, #9b87d6 100%);
     color: #1a1f3a;
     font-weight: 600;
 }
 
 .btn-yellow { 
-    background: linear-gradient(135deg, #e8d8a8 0%, #d6c687 100%);
+    background: linear-gradient(135deg, #b8a8e8 0%, #9b87d6 100%);
     color: #1a1f3a;
     font-weight: 600;
 }
 
 .btn-blue { 
-    background: linear-gradient(135deg, #a8d5f5 0%, #87bfe3 100%);
+    background: linear-gradient(135deg, #b8a8e8 0%, #9b87d6 100%);
     color: #1a1f3a;
     font-weight: 600;
 }
 
 .btn-green { 
-    background: linear-gradient(135deg, #a8e8c5 0%, #87d6a8 100%);
+    background: linear-gradient(135deg, #b8a8e8 0%, #87d6a8 100%);
     color: #1a1f3a;
     font-weight: 600;
 }

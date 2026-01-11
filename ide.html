@@ -4,48 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="css/style.css">
-    <title>Interactive Code Portfolio</title>
+    <title>Interactive Code Playground</title>
 </head>
 <body>
     <div class="app">
     <div class="header">
         <div class="logo">
             <img src="assets/logo.png" alt="Scriptly Logo" class="logo-img">
-            Interactive Code Portfolio
+            Interactive Code playground
         </div>
         <div class="toolbar">
-            <button class="btn btn-dark" onclick="toggleDarkMode()">🌙</button>
-            <button class="btn btn-purple" onclick="saveCode()">💾 Save</button>
-            <button class="btn btn-pink" onclick="loadCode()">📁 Load</button>
-            <button class="btn btn-blue" onclick="exportCode()">📤 Export</button>
-            <button class="btn btn-yellow" onclick="toggleShortcuts()">⌨️ Shortcuts</button>
-            <button class="btn btn-dark" onclick="clearCode()">🗑️ Clear</button>
-            <button class="btn btn-run" onclick="runCode()">▶️ Run</button>
+            <button class="btn btn-dark" onclick="toggleDarkMode()">Mode</button>
+            <button class="btn btn-purple" onclick="saveCode()">Save</button>
+            <button class="btn btn-pink" onclick="loadCode()">Load</button>
+            <button class="btn btn-blue" onclick="exportCode()">Export</button>
+            <button class="btn btn-yellow" onclick="toggleShortcuts()">⌨Shortcuts</button>
+            <button class="btn btn-dark" onclick="clearCode()">Clear</button>
+            <button class="btn btn-run" onclick="runCode()">▶Run</button>
         </div>
     </div>
 
     <div class="main-container">
         <div class="editor-section">
             <div class="tabs">
-                <div class="tab active" data-lang="html">📄 HTML</div>
-                <div class="tab" data-lang="css">🎨 CSS</div>
-                <div class="tab" data-lang="js">⚡ JavaScript</div>
+                <div class="tab active" data-lang="html">HTML</div>
+                <div class="tab" data-lang="css">CSS</div>
+                <div class="tab" data-lang="js">JavaScript</div>
             </div>
             <div class="editor-container">
                 <div class="empty-state" id="emptyState">
-                    <h3>👋 Welcome to Scriptly</h3>
+                    <h3>Welcome to Scriptly 👋</h3>
                     <p>Start typing HTML, CSS, or JavaScript<br>to see live preview.</p>
                 </div>
                 <textarea class="editor" id="htmlEditor" spellcheck="false"><h1 id="hi">Hello world!</h1></textarea>
                 <textarea class="editor" id="cssEditor" style="display:none;" spellcheck="false">body {
   font-family: Arial, sans-serif;
   padding: 20px;
-  background: linear-gradient(135deg, #fda4af 0%, #c4b5fd 100%);
-}
+  background-color: #f0f0f0;}
 
 h1 {
   color: #1a1a1a;
   font-size: 48px;
+  color: OrangeRed;
 }</textarea>
                 <textarea class="editor" id="jsEditor" style="display:none;" spellcheck="false">// Add your JavaScript here
 console.log('Hello from the console!');</textarea>
@@ -53,7 +53,7 @@ console.log('Hello from the console!');</textarea>
             <div class="console">
                 <div class="console-resizer" id="consoleResizer"></div>
                 <div class="console-header">
-                    <div class="console-title">📟 Console</div>
+                    <div class="console-title">Console</div>
                     <button class="clear-console" onclick="clearConsole()">Clear</button>
                 </div>
                 <div id="consoleOutput"></div>
@@ -75,7 +75,7 @@ console.log('Hello from the console!');</textarea>
     <!-- Keyboard Shortcuts Modal -->
     <div class="shortcuts-modal" id="shortcutsModal">
         <div class="shortcuts-content">
-            <h2>⌨️ Keyboard Shortcuts</h2>
+            <h2>⌨Keyboard Shortcuts</h2>
             <div class="shortcut-item">
                 <span>Run Code</span>
                 <span class="shortcut-key">Ctrl + Enter</span>
