@@ -571,6 +571,13 @@ ${js}
     updateCursorPosition();
     updateEmptyState();
     runCode(); // This runs the initial code to show in preview
+
+    // Mobile menu toggle function
+function toggleMobileMenu() {
+    const toolbar = document.getElementById('toolbar');
+    toolbar.classList.toggle('mobile-open');
+}
+window.toggleMobileMenu = toggleMobileMenu;
 });
 
 

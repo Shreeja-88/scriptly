@@ -873,3 +873,127 @@ body.light-mode .empty-state p {
     transform: scale(1.05);
     box-shadow: 0 4px 12px rgba(111, 165, 212, 0.5);
 }
+/* Mobile Menu Toggle Button */
+.mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    color: #a8d5f5;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 8px;
+}
+
+/* Tablet - Vertical Layout */
+@media (max-width: 1024px) {
+    .main-container {
+        flex-direction: column !important;
+    }
+    
+    .editor-section {
+        height: 50vh;
+        border-right: none;
+        border-bottom: 2px solid #4a6fa5;
+    }
+    
+    .preview-section {
+        height: 50vh;
+    }
+    
+    .resizer {
+        display: none !important;
+    }
+    
+    .console {
+        height: 120px;
+    }
+}
+
+/* Mobile - Compact Layout */
+@media (max-width: 768px) {
+    .header {
+        flex-wrap: wrap;
+        padding: 10px 15px;
+    }
+    
+    .logo {
+        font-size: 16px;
+    }
+    
+    .logo-img {
+        width: 32px;
+        height: 32px;
+    }
+    
+    .mobile-menu-toggle {
+        display: block !important;
+    }
+    
+    .toolbar {
+        width: 100%;
+        margin-top: 10px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease;
+    }
+    
+    .toolbar.mobile-open {
+        max-height: 500px;
+    }
+    
+    .btn {
+        padding: 6px 12px;
+        font-size: 12px;
+        flex: 1;
+    }
+    
+    .tab {
+        padding: 10px 12px;
+        font-size: 13px;
+    }
+    
+    .editor {
+        font-size: 13px;
+        padding: 15px;
+    }
+    
+    .console {
+        height: 100px;
+        font-size: 12px;
+    }
+    
+    .status-bar {
+        flex-direction: column;
+        gap: 8px;
+        font-size: 11px;
+    }
+    
+    .status-left, .status-right {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+}
+
+/* Small Mobile */
+@media (max-width: 480px) {
+    .logo span {
+        display: none;
+    }
+    
+    .editor-section {
+        height: 60vh;
+    }
+    
+    .preview-section {
+        height: 40vh;
+    }
+    
+    .console {
+        height: 80px;
+    }
+    
+    .editor {
+        font-size: 12px;
+        padding: 10px;
+    }
+}
