@@ -3,29 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scriptly - Interactive Code Portfolio</title>
+    <title>Scriptly - Modern Interactive Code Playground</title>
     <style>
+        /* ============================================
+           MODERN HOMEPAGE DESIGN
+           Professional & Responsive
+           ============================================ */
+        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1a1f3a 0%, #0f1729 100%);
-            color: #e0e8f0;
-            overflow-x: hidden;
+        :root {
+            /* Modern Color Palette */
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #8b5cf6;
+            --accent: #ec4899;
+            --success: #10b981;
+            
+            --bg-dark: #0f172a;
+            --bg-darker: #020617;
+            --bg-light: #1e293b;
+            --text-light: #f8fafc;
+            --text-muted: #94a3b8;
+            
+            --gradient-1: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            --gradient-2: linear-gradient(135deg, #ec4899 0%, #8b5cf6 100%);
+            --gradient-3: linear-gradient(135deg, #10b981 0%, #6366f1 100%);
         }
 
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-light);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* === NAVBAR === */
         .navbar {
-            background: linear-gradient(135deg, #2a3f5f 0%, #1e2d4a 100%);
-            padding: 15px 40px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(12px);
+            padding: 16px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 2px solid #4a6fa5;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .navbar.scrolled {
+            background: rgba(15, 23, 42, 0.95);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
 
         .logo-home {
@@ -33,197 +68,226 @@
             align-items: center;
             gap: 12px;
             font-size: 24px;
-            font-weight: 700;
-            color: #a8d5f5;
+            font-weight: 800;
+            color: var(--text-light);
             text-decoration: none;
+            transition: transform 0.3s ease;
+        }
+
+        .logo-home:hover {
+            transform: translateX(4px);
         }
 
         .logo-icon {
-            width: 45px;
-            height: 45px;
-            animation: pulse 2s ease-in-out infinite;
+            width: 48px;
+            height: 48px;
+            filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.5));
+            animation: logoFloat 3s ease-in-out infinite;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(5deg); }
         }
 
         .nav-buttons {
             display: flex;
-            gap: 15px;
+            gap: 12px;
         }
 
         .btn {
             padding: 12px 32px;
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             cursor: pointer;
             font-size: 16px;
-            font-weight: 600;
+            font-weight: 700;
             transition: all 0.3s ease;
             text-decoration: none;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
         }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
         .btn:hover {
-    transform: translateY(-4px) scale(1.05);
-    filter: brightness(1.1);
-}
+            transform: translateY(-3px);
+        }
 
-.btn:active {
-    transform: scale(0.98);
-}
-@keyframes softGlow {
-    0%, 100% { box-shadow: 0 0 0 rgba(111,165,212,0); }
-    50% { box-shadow: 0 0 30px rgba(111,165,212,0.6); }
-}
-
-.btn-primary {
-    animation: softGlow 3s infinite;
-}
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation: none !important;
-        transition: none !important;
-    }
-    .hero-video {
-        display: none;
-    }
-}
-.navbar.scrolled {
-    backdrop-filter: blur(12px);
-    background: rgba(30, 45, 74, 0.85);
-}
-.feature-icon {
-    animation: floatIcon 4s ease-in-out infinite;
-}
-
-@keyframes floatIcon {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-}
-
+        .btn:active {
+            transform: translateY(-1px) scale(0.98);
+        }
 
         .btn-primary {
-            background: linear-gradient(135deg, #6fa5d4 0%, #5a8fbe 100%);
+            background: var(--gradient-1);
             color: white;
-            box-shadow: 0 4px 12px rgba(111, 165, 212, 0.4);
+            box-shadow: 0 4px 16px rgba(99, 102, 241, 0.4);
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px) scale(1.05);
-            box-shadow: 0 8px 24px rgba(111, 165, 212, 0.6);
+            box-shadow: 0 8px 32px rgba(99, 102, 241, 0.6);
         }
 
         .btn-secondary {
-            background: linear-gradient(135deg, #b8a8e8 0%, #9483c6 100%);
-            color: #1a1f3a;
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
         }
 
         .btn-secondary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(184, 168, 232, 0.4);
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
         }
 
         .btn-large {
             font-size: 18px;
-            padding: 16px 48px;
+            padding: 18px 48px;
         }
 
+        /* === HERO SECTION === */
         .hero {
-            
             min-height: 90vh;
             display: flex;
             align-items: center;
             justify-content: center;
             position: relative;
             overflow: hidden;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1f3a 100%);
+        }
+
+        .hero-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.15;
+            filter: blur(2px);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, 
+                rgba(99, 102, 241, 0.1) 0%, 
+                transparent 50%);
         }
 
         .bg-circles {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            inset: 0;
             overflow: hidden;
-            z-index: 0;
+            pointer-events: none;
         }
 
         .circle {
             position: absolute;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(168, 213, 245, 0.1) 0%, transparent 70%);
-            animation: float 6s ease-in-out infinite;
+            background: radial-gradient(circle, 
+                rgba(99, 102, 241, 0.15) 0%, 
+                transparent 70%);
+            animation: floatCircle 8s ease-in-out infinite;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
+        @keyframes floatCircle {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-30px, 30px) scale(0.9); }
         }
 
         .circle:nth-child(1) {
-            width: 300px;
-            height: 300px;
+            width: 400px;
+            height: 400px;
             top: 10%;
-            left: 10%;
+            left: 5%;
             animation-delay: 0s;
         }
 
         .circle:nth-child(2) {
-            width: 200px;
-            height: 200px;
-            top: 60%;
-            right: 15%;
+            width: 300px;
+            height: 300px;
+            top: 50%;
+            right: 10%;
             animation-delay: 2s;
         }
 
         .circle:nth-child(3) {
             width: 250px;
             height: 250px;
-            bottom: 10%;
-            left: 50%;
+            bottom: 15%;
+            left: 45%;
             animation-delay: 4s;
         }
 
         .hero-content {
             text-align: center;
-            z-index: 1;
-            max-width: 800px;
-            padding: 40px;
+            z-index: 10;
+            max-width: 900px;
+            padding: 40px 20px;
+            animation: heroFadeIn 1s ease-out;
         }
-        .hero-video {
-  opacity: 1;
-  z-index: 1 !important;
- }
-.hero-video {
-  width: 600px;
-  height: 350px;
-  object-fit: cover;
-  border-radius: 16px;
-}
 
+        @keyframes heroFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         .hero-title {
-            font-size: 64px;
-            font-weight: 700;
-            background: linear-gradient(135deg, #a8d5f5 0%, #b8a8e8 50%, #d4a5c4 100%);
+            font-size: clamp(40px, 8vw, 72px);
+            font-weight: 900;
+            background: linear-gradient(135deg, 
+                #a5b4fc 0%, 
+                #c4b5fd 30%, 
+                #f0abfc 60%, 
+                #fbbf24 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            line-height: 1.2;
         }
 
         .hero-subtitle {
-            font-size: 20px;
-            color: #8ca5c5;
+            font-size: clamp(16px, 3vw, 22px);
+            color: var(--text-muted);
             margin-bottom: 40px;
-            line-height: 1.6;
+            line-height: 1.8;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
+        /* === FEATURES SECTION === */
         .features-section {
-            padding: 80px 40px;
-            background: linear-gradient(135deg, #0f1729 0%, #1a1f3a 100%);
+            padding: 100px 40px;
+            background: linear-gradient(180deg, var(--bg-dark) 0%, var(--bg-darker) 100%);
+            position: relative;
         }
 
         .container {
@@ -233,185 +297,257 @@
 
         .section-title {
             text-align: center;
-            font-size: 42px;
-            color: #a8d5f5;
-            margin-bottom: 20px;
+            font-size: clamp(32px, 6vw, 48px);
+            font-weight: 800;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
         }
 
         .section-subtitle {
             text-align: center;
-            font-size: 18px;
-            color: #8ca5c5;
-            margin-bottom: 60px;
+            font-size: clamp(16px, 2.5vw, 20px);
+            color: var(--text-muted);
+            margin-bottom: 64px;
         }
 
         .feature-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
+            gap: 28px;
         }
 
         .feature-card {
-            background: linear-gradient(135deg, #2a3f5f 0%, #1e2d4a 100%);
-            border: 2px solid #4a6fa5;
-            border-radius: 12px;
-            padding: 30px;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            padding: 32px;
             text-align: center;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: 0;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.05;
         }
 
         .feature-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 24px rgba(74, 111, 165, 0.4);
+            transform: translateY(-8px);
+            border-color: rgba(99, 102, 241, 0.5);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.2);
+        }
+
+        .feature-card > * {
+            position: relative;
+            z-index: 1;
         }
 
         .feature-icon {
-            font-size: 48px;
-            margin-bottom: 15px;
+            font-size: 56px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: floatIcon 4s ease-in-out infinite;
+        }
+
+        @keyframes floatIcon {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
         }
 
         .feature-title {
-            font-size: 20px;
-            color: #a8d5f5;
-            margin-bottom: 10px;
-            font-weight: 600;
+            font-size: 22px;
+            color: var(--text-light);
+            margin-bottom: 12px;
+            font-weight: 700;
         }
 
         .feature-desc {
-            color: #8ca5c5;
-            font-size: 14px;
-            line-height: 1.5;
+            color: var(--text-muted);
+            font-size: 15px;
+            line-height: 1.7;
         }
 
+        /* === CTA SECTION === */
         .cta-section {
-            padding: 100px 40px;
+            padding: 120px 40px;
             text-align: center;
-            background: linear-gradient(135deg, #2a3f5f 0%, #1e2d4a 100%);
-            border-top: 2px solid #4a6fa5;
+            background: linear-gradient(135deg, 
+                rgba(99, 102, 241, 0.1) 0%, 
+                rgba(139, 92, 246, 0.1) 100%);
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, 
+                rgba(99, 102, 241, 0.15) 0%, 
+                transparent 70%);
+            animation: ctaRotate 20s linear infinite;
+        }
+
+        @keyframes ctaRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .cta-title {
-            font-size: 48px;
-            color: #a8d5f5;
-            margin-bottom: 20px;
+            font-size: clamp(36px, 7vw, 56px);
+            font-weight: 900;
+            background: var(--gradient-2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+            position: relative;
+            z-index: 1;
         }
 
         .cta-text {
-            font-size: 20px;
-            color: #8ca5c5;
-            margin-bottom: 40px;
+            font-size: clamp(16px, 3vw, 22px);
+            color: var(--text-muted);
+            margin-bottom: 48px;
+            position: relative;
+            z-index: 1;
         }
-        .hero-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 200%;
-    min-height: 200%;
-    transform: translate(-50%, -50%);
-    object-fit: cover;
-    z-index: 0;
-    opacity: 0.35;
-}
 
-.hero-overlay {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        135deg,
-        rgba(15, 23, 41, 0.85),
-        rgba(26, 31, 58, 0.85)
-    );
-    z-index: 0;
-}
-.feature-card {
-    transform: translateY(40px) scale(0.95);
-    opacity: 0;
-    transition: all 0.8s ease;
-}
-
-.feature-card.show {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-}
-
-.feature-icon {
-    animation: floatIcon 4s ease-in-out infinite;
-}
-
-@keyframes floatIcon {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-}
-.hero-video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.3;
-}
-
-
-
+        /* === FOOTER === */
         .footer {
-            background: #0a0f1a;
-            padding: 30px 40px;
+            background: var(--bg-darker);
+            padding: 32px 40px;
             text-align: center;
-            border-top: 2px solid #2a3f5f;
-            color: #4a6fa5;
+            border-top: 1px solid rgba(99, 102, 241, 0.2);
+            color: var(--text-muted);
+            font-size: 14px;
         }
-        /* Home Page Mobile */
-@media (max-width: 768px) {
-    .navbar {
-        padding: 12px 20px;
-        flex-wrap: wrap;
-    }
-    
-    .logo-home {
-        font-size: 20px;
-    }
-    
-    .nav-buttons {
-        width: 100%;
-        margin-top: 10px;
-        justify-content: center;
-    }
-    
-    .hero-title {
-        font-size: 36px;
-    }
-    
-    .hero-subtitle {
-        font-size: 16px;
-    }
-    
-    .feature-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .section-title {
-        font-size: 32px;
-    }
-    
-    .cta-title {
-        font-size: 32px;
-    }
-    
-    .circle {
-        display: none;
-    }
-}
 
-@media (max-width: 480px) {
-    .hero-title {
-        font-size: 28px;
-    }
-}
+        /* === RESPONSIVE DESIGN === */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 14px 20px;
+                flex-wrap: wrap;
+            }
+            
+            .logo-home {
+                font-size: 20px;
+            }
+            
+            .logo-icon {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .nav-buttons {
+                width: 100%;
+                margin-top: 12px;
+                justify-content: center;
+            }
+            
+            .btn {
+                padding: 10px 24px;
+                font-size: 14px;
+            }
+            
+            .hero {
+                min-height: 80vh;
+            }
+            
+            .hero-content {
+                padding: 30px 16px;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .features-section {
+                padding: 60px 20px;
+            }
+            
+            .cta-section {
+                padding: 80px 20px;
+            }
+            
+            .circle {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .navbar {
+                padding: 12px 16px;
+            }
+            
+            .btn-large {
+                font-size: 16px;
+                padding: 14px 32px;
+            }
+            
+            .feature-card {
+                padding: 24px;
+            }
+            
+            .feature-icon {
+                font-size: 48px;
+            }
+        }
+
+        /* === ACCESSIBILITY === */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .hero-video {
+                display: none;
+            }
+        }
+
+        /* === SCROLL ANIMATIONS === */
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar">
-        <a href="home.html" class="logo-home">
+    <!-- Navigation Bar -->
+    <nav class="navbar" id="navbar">
+        <a href="index.html" class="logo-home">
             <img src="assets/logo.png" alt="Scriptly Logo" class="logo-icon">
             Scriptly
         </a>
@@ -420,6 +556,7 @@
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <section class="hero">
         <div class="bg-circles">
             <div class="circle"></div>
@@ -434,100 +571,112 @@
         <div class="hero-content">
             <h1 class="hero-title">Code. Create. Deploy.</h1>
             <p class="hero-subtitle">
-                A powerful online IDE for HTML, CSS, and JavaScript.<br>
+                A powerful, modern online IDE for HTML, CSS, and JavaScript.<br>
                 Build stunning projects with live preview and instant feedback.
             </p>
             <a href="ide.html" class="btn btn-primary btn-large">Start Coding Now 🚀</a>
         </div>
     </section>
 
+    <!-- Features Section -->
     <section class="features-section">
         <div class="container">
             <h2 class="section-title">Why Choose Scriptly?</h2>
             <p class="section-subtitle">Everything you need to build amazing web projects</p>
             
             <div class="feature-grid">
-                <div class="feature-card">
+                <div class="feature-card fade-in-up">
                     <div class="feature-icon">⚡</div>
                     <h3 class="feature-title">Lightning Fast</h3>
-                    <p class="feature-desc">Instant live preview as you type. No delays, no waiting.</p>
+                    <p class="feature-desc">Instant live preview as you type. No delays, no waiting. Experience real-time feedback.</p>
                 </div>
                              
-                <div class="feature-card">
+                <div class="feature-card fade-in-up">
                     <div class="feature-icon">💾</div>
                     <h3 class="feature-title">Auto-Save</h3>
-                    <p class="feature-desc">Never lose your work. Automatic saving every 5 seconds.</p>
+                    <p class="feature-desc">Never lose your work. Automatic saving every 5 seconds keeps your code safe.</p>
                 </div>
                 
-                <div class="feature-card">
+                <div class="feature-card fade-in-up">
                     <div class="feature-icon">🔧</div>
                     <h3 class="feature-title">Resizable Panels</h3>
-                    <p class="feature-desc">Customize your workspace. Drag to resize editor and console.</p>
+                    <p class="feature-desc">Customize your workspace. Drag to resize editor and console to your preference.</p>
                 </div>
                 
-                <div class="feature-card">
+                <div class="feature-card fade-in-up">
                     <div class="feature-icon">⌨️</div>
                     <h3 class="feature-title">Keyboard Shortcuts</h3>
-                    <p class="feature-desc">Work faster with powerful shortcuts. Ctrl+Enter to run code.</p>
+                    <p class="feature-desc">Work faster with powerful shortcuts. Ctrl+Enter to run code instantly.</p>
                 </div>
                 
-                <div class="feature-card">
-                    <div class="feature-icon">📟</div>
+                <div class="feature-card fade-in-up">
+                    <div class="feature-icon">🖥️</div>
                     <h3 class="feature-title">Smart Console</h3>
-                    <p class="feature-desc">Track logs, warnings, and errors with timestamps.</p>
+                    <p class="feature-desc">Track logs, warnings, and errors with timestamps. Debug efficiently.</p>
                 </div>
                 
-                <div class="feature-card">
+                <div class="feature-card fade-in-up">
                     <div class="feature-icon">💡</div>
                     <h3 class="feature-title">Live Status Bar</h3>
-                    <p class="feature-desc">See line numbers, cursor position, and active language.</p>
+                    <p class="feature-desc">See line numbers, cursor position, and active language at a glance.</p>
                 </div>
                 
-                <div class="feature-card">
+                <div class="feature-card fade-in-up">
                     <div class="feature-icon">🎯</div>
                     <h3 class="feature-title">Auto-Run Toggle</h3>
-                    <p class="feature-desc">Choose automatic or manual code execution.</p>
+                    <p class="feature-desc">Choose automatic or manual code execution. Full control over your workflow.</p>
                 </div>
                 
-                <div class="feature-card">
+                <div class="feature-card fade-in-up">
                     <div class="feature-icon">📤</div>
                     <h3 class="feature-title">Export Projects</h3>
-                    <p class="feature-desc">Download your projects as standalone HTML files.</p>
+                    <p class="feature-desc">Download your projects as standalone HTML files. Share and deploy easily.</p>
                 </div>
             </div>
         </div>
     </section>
 
+    <!-- CTA Section -->
     <section class="cta-section">
         <h2 class="cta-title">Ready to Start Building?</h2>
         <p class="cta-text">Join thousands of developers using Scriptly to create amazing projects</p>
         <a href="ide.html" class="btn btn-primary btn-large">Launch IDE →</a>
     </section>
 
+    <!-- Footer -->
     <footer class="footer">
-        <p>© 2026 Scriptly • Write. Run. Preview. • Made with 💙 for developers • Shreeja Hebbar
- </p>
+        <p>© 2026 Scriptly • Write. Run. Preview. • Made with 💙 for developers • Shreeja Hebbar</p>
     </footer>
+
+    <!-- Scripts -->
+    <script>
+        // Navbar scroll effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Intersection Observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.15,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-up').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
 </body>
 </html>
-
-<script>
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('show');
-    }
-  });
-}, { threshold: 0.2 });
-
-document.querySelectorAll('.feature-card').forEach(card => {
-  observer.observe(card);
-});
-</script>
-
-<script>
-window.addEventListener('scroll', () => {
-  document.querySelector('.navbar')
-    .classList.toggle('scrolled', window.scrollY > 50);
-});
-</script>
